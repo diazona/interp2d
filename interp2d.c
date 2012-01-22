@@ -66,3 +66,15 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
     DISCARD_STATUS(status);
     return z;
 }
+
+size_t interp2d_type_min_size(const interp2d_type* T) {
+    return T->min_size;
+}
+
+size_t interp2d_min_size(const interp2d* interp) {
+    return interp->type->min_size;
+}
+
+const char* interp2d_name(const interp2d* interp) {
+    return interp->type->name;
+}
