@@ -1,0 +1,4 @@
+[Project]
+Name=interp2d
+Manager=KDevCMakeManager
+VersionControl=kdevgit
