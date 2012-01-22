@@ -2,6 +2,8 @@
 #include <gsl/gsl_math.h>
 #include "interp2d.h"
 
+#define DISCARD_STATUS(s) if ((s) != GSL_SUCCESS) { GSL_ERROR_VAL("interpolation error", (s),  GSL_NAN); }
+
 interp2d* interp2d_alloc(const interp2d_type* T, size_t size) {
     interp2d* interp;
     if (size < T->min_size) {
@@ -49,7 +51,9 @@ int interp2d_init(interp2d* interp, const double xarr[], const double yarr[], co
 }
 
 void interp2d_free(interp2d* interp) {
-    RETURN_IF_NULL(interp);
+    if (!interp) {
+        return;
+    }
     if (interp->type->free) {
         interp->type->free(interp->state);
     }
