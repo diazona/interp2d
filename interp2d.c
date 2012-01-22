@@ -66,6 +66,9 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
     if (x < interp->xmin || x > interp->xmax) {
         GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
     }
+    if (y < interp->ymin || y > interp->ymax) {
+        GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
+    }
     status = interp->type->eval(interp->state, xarr, yarr, zarr, interp->size, x, y, xa, ya, &z);
     DISCARD_STATUS(status);
     return z;
