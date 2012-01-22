@@ -2,11 +2,11 @@
 #include <gsl/gsl_interp.h>
 #include "interp2d.h"
 
-static int bilinear_init(void* state, const double xa[], const double ya[], const double* za[], size_t size) {
+static int bilinear_init(void* state, const double xa[], const double ya[], const double za[], size_t size) {
     return GSL_SUCCESS; // for success
 }
 
-static int bilinear_eval(const void* state, const double xarr[], const double yarr[], const double* zarr[], size_t size, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
+static int bilinear_eval(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t size, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
     double xmin, xmax, ymin, ymax, zminmin, zminmax, zmaxmin, zmaxmax;
     double dx, dy;
     double t, u;
@@ -27,10 +27,10 @@ static int bilinear_eval(const void* state, const double xarr[], const double ya
     xmax = xarr[xi + 1];
     ymin = yarr[yi];
     ymax = yarr[yi + 1];
-    zminmin = zarr[xi][yi];
-    zminmax = zarr[xi][yi + 1];
-    zmaxmin = zarr[xi + 1][yi];
-    zmaxmax = zarr[xi + 1][yi + 1];
+    zminmin = zarr[INDEX_2D(xi, yi, size, size)];
+    zminmax = zarr[INDEX_2D(xi, yi + 1, size, size)];
+    zmaxmin = zarr[INDEX_2D(xi + 1, yi, size, size)];
+    zmaxmax = zarr[INDEX_2D(xi + 1, yi + 1, size, size)];
     dx = xmax - xmin;
     dy = ymax - ymin;
     t = (x - xmin)/dx;

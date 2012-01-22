@@ -3,7 +3,7 @@
 #include <gsl/gsl_test.h>
 #include "interp2d.h"
 
-int test_interp2d(const double xarr[], const double yarr[], const double* zarr[], size_t size, const double xval[], const double yval[], const double zval[], size_t test_size, const interp2d_type* T) {
+int test_interp2d(const double xarr[], const double yarr[], const double zarr[], size_t size, const double xval[], const double yval[], const double zval[], size_t test_size, const interp2d_type* T) {
     gsl_interp_accel *xa, *ya;
     int status = 0;
     size_t i;
@@ -36,10 +36,10 @@ int test_bilinear() {
     size_t size = 4, test_size = 6;
     double xarr[4] = {0.0, 1.0, 2.0, 3.0};
     double yarr[4] = {0.0, 1.0, 2.0, 3.0};
-    double zarr[4][4] = {{1.0, 1.1, 1.2, 1.3},
-                          {1.1, 1.2, 1.3, 1.4},
-                          {1.2, 1.3, 1.4, 1.5},
-                          {1.3, 1.4, 1.5, 1.6}};
+    double zarr[16] = {1.0, 1.1, 1.2, 1.3,
+                        1.1, 1.2, 1.3, 1.4,
+                        1.2, 1.3, 1.4, 1.5,
+                        1.3, 1.4, 1.5, 1.6};
     double xval[6] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
     double yval[6] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
     double zval[6] = {1.0, 1.1, 1.2, 1.3, 1.5, 1.6};

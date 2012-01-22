@@ -27,7 +27,7 @@ interp2d* interp2d_alloc(const interp2d_type* T, size_t size) {
     return interp;
 }
 
-int interp2d_init(interp2d* interp, const double xarr[], const double yarr[], const double* zarr[], size_t size) {
+int interp2d_init(interp2d* interp, const double xarr[], const double yarr[], const double zarr[], size_t size) {
     size_t i;
     if (size != interp->size) {
         GSL_ERROR("data must match size of interpolation object", GSL_EINVAL);
@@ -60,7 +60,7 @@ void interp2d_free(interp2d* interp) {
     free(interp);
 }
 
-double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double* zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
     double z;
     int status;
     if (x < interp->xmin || x > interp->xmax) {
