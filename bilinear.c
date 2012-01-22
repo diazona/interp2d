@@ -3,7 +3,7 @@
 #include "interp2d.h"
 
 static int bilinear_init(void* state, const double xa[], const double ya[], const double za[], size_t size) {
-    return GSL_SUCCESS; // for success
+    return GSL_SUCCESS;
 }
 
 static int bilinear_eval(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t size, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
