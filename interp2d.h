@@ -25,6 +25,8 @@ typedef struct {
     void* state;
 } interp2d;
 
+GSL_VAR const interp2d_type* interp2d_bilinear;
+
 interp2d* interp2d_alloc(const interp2d_type* T, size_t size);
 int interp2d_init(interp2d* interp, const double xa[], const double ya[], const double* za[], size_t size);
 void interp2d_free(interp2d* interp);
