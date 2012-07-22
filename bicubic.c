@@ -62,7 +62,7 @@ static int bicubic_eval(const void* state, const double xarr[], const double yar
     // t and u are the positions within the grid cell at which we are computing
     // the interpolation, in units of grid cell size
     double t, u;
-    double z_accumulator;
+    double z_accumulator = 0;
     size_t xi, yi;
     size_t i, j;
     // First compute the indices into the data arrays where we are interpolating
