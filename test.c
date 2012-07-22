@@ -48,7 +48,7 @@ int test_bilinear() {
     return status;
 }
 
-int test_bicubic() {
+void test_bicubic() {
     int status;
     size_t size = 4, test_size = 3;
     double xarr[4] = {0.0, 1.0, 2.0, 3.0};
