@@ -48,10 +48,27 @@ int test_bilinear() {
     return status;
 }
 
+int test_bicubic() {
+    int status;
+    size_t size = 4, test_size = 3;
+    double xarr[4] = {0.0, 1.0, 2.0, 3.0};
+    double yarr[4] = {0.0, 1.0, 2.0, 3.0};
+    double zarr[16] = {1.0, 1.1, 1.2, 1.3,
+                        1.1, 1.2, 1.3, 1.4,
+                        1.2, 1.3, 1.4, 1.5,
+                        1.3, 1.4, 1.5, 1.6};
+    double xval[6] = {1.0, 1.5, 2.0};
+    double yval[6] = {1.0, 1.5, 2.0};
+    double zval[6] = {1.2, 1.3, 1.4};
+    status = test_interp2d(xarr, yarr, zarr, size, size, xval, yval, zval, test_size, interp2d_bicubic);
+    gsl_test(status, "bicubic interpolation on linear function");
+}
+
 int main(int argc, char** argv) {
     gsl_ieee_env_setup();
     argc = 0;
     argv = 0;
     test_bilinear();
+    test_bicubic();
     exit(gsl_test_summary());
 }
