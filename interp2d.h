@@ -52,8 +52,8 @@ typedef struct {
 
 /** An instance for bilinear interpolation. */
 GSL_VAR const interp2d_type* interp2d_bilinear;
+GSL_VAR const interp2d_type* interp2d_bicubic;
 // To be added:
-// GSL_VAR const interp2d_type* interp2d_bicubic;
 // GSL_VAR const interp2d_type* interp2d_bipoly;
 
 /**
