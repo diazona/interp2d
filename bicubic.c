@@ -3,7 +3,7 @@
 #include <math.h>
 #include "interp2d.h"
 
-const static double bicubic_inversion_matrix = {
+const static double bicubic_inversion_matrix[] = {
     // columns act on:
     // values      x derivs     y derivs      xy derivs
      1, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, // computes a_00
