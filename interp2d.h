@@ -46,7 +46,7 @@ typedef struct {
     size_t xsize;
     /** The number of y values provided. */
     size_t ysize;
-    /** A state object. */
+    /** A state object. This is specific to the interpolation type. */
     void* state;
 } interp2d;
 
