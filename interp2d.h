@@ -110,7 +110,7 @@ void interp2d_free(interp2d* interp);
  */
 double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
-#define INDEX_2D(xi, yi, xsize, ysize) (xi) * (xsize) + (yi)
+#define INDEX_2D(xi, yi, xsize, ysize) (xi) * (ysize) + (yi)
 
 #ifdef __cplusplus
 }
