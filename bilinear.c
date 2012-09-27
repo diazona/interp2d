@@ -66,7 +66,8 @@ static const interp2d_type bilinear_type = {
     2,
     NULL,
     &bilinear_init,
-    &bilinear_eval
+    &bilinear_eval,
+    NULL
 };
 
 const interp2d_type* interp2d_bilinear = &bilinear_type;
