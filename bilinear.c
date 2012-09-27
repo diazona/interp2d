@@ -67,6 +67,11 @@ static const interp2d_type bilinear_type = {
     NULL,
     &bilinear_init,
     &bilinear_eval,
+    NULL, // derivatives: not yet implemented
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     NULL
 };
 

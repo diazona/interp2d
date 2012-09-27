@@ -43,9 +43,16 @@ typedef struct {
     int (*init)(void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize);
     /** The method that evaluates the interpolation at the given point. */
     int (*eval)(const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z);
-//     int (*eval_deriv) (const void*, const double xa[], const double ya[], const double za[][], size_t size, double x, double y, interp2d_accel*, double* z_p);
-//     int (*eval_deriv2) (const void*, const double xa[], const double ya[], const double za[][], size_t size, double x, double y, interp2d_accel*, double* z_pp);
-//     int (*integ) (const void*, const double xa[], const double ya[], const double za[][], size_t size, interp2d_accel*, double xa, double xb, double ya, double yb, double* result);
+    /** The method that evaluates the x derivative of the interpolation at the given point. */
+    int (*eval_deriv_x) (const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z_p);
+    /** The method that evaluates the y derivative of the interpolation at the given point. */
+    int (*eval_deriv_y) (const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z_p);
+    /** The method that evaluates the second x derivative of the interpolation at the given point. */
+    int (*eval_deriv_xx) (const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z_pp);
+    /** The method that evaluates the second y derivative of the interpolation at the given point. */
+    int (*eval_deriv_xy) (const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z_pp);
+    /** The method that evaluates the cross derivative of the interpolation at the given point. */
+    int (*eval_deriv_yy) (const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z_pp);
     /** The method that frees the memory. */
     void (*free)(void*);
 } interp2d_type;
