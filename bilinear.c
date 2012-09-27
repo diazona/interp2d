@@ -61,17 +61,88 @@ static int bilinear_eval(const void* state, const double xarr[], const double ya
     return GSL_SUCCESS;
 }
 
+static int bilinear_deriv_x(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z_p) {
+    double xmin, xmax, ymin, ymax, zminmin, zminmax, zmaxmin, zmaxmax;
+    double dx, dy;
+    double dt, u;
+    size_t xi, yi;
+    if (xa != NULL) {
+        xi = gsl_interp_accel_find(xa, xarr, xsize, x);
+    }
+    else {
+        xi = gsl_interp_bsearch(xarr, x, 0, xsize - 1);
+    }
+    if (ya != NULL) {
+        yi = gsl_interp_accel_find(ya, yarr, ysize, y);
+    }
+    else {
+        yi = gsl_interp_bsearch(yarr, y, 0, ysize - 1);
+    }
+    xmin = xarr[xi];
+    xmax = xarr[xi + 1];
+    ymin = yarr[yi];
+    ymax = yarr[yi + 1];
+    zminmin = zarr[INDEX_2D(xi, yi, xsize, ysize)];
+    zminmax = zarr[INDEX_2D(xi, yi + 1, xsize, ysize)];
+    zmaxmin = zarr[INDEX_2D(xi + 1, yi, xsize, ysize)];
+    zmaxmax = zarr[INDEX_2D(xi + 1, yi + 1, xsize, ysize)];
+    dx = xmax - xmin;
+    dy = ymax - ymin;
+    dt = 1./dx; // partial t / partial x
+    u = (y - ymin)/dy;
+    *z_p = -dt*(1.-u)*zminmin + dt*(1.-u)*zmaxmin - dt*u*zminmax + dt*u*zmaxmax;
+    return GSL_SUCCESS;
+}
+
+static int bilinear_deriv_y(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z_p) {
+    double xmin, xmax, ymin, ymax, zminmin, zminmax, zmaxmin, zmaxmax;
+    double dx, dy;
+    double t, du;
+    size_t xi, yi;
+    if (xa != NULL) {
+        xi = gsl_interp_accel_find(xa, xarr, xsize, x);
+    }
+    else {
+        xi = gsl_interp_bsearch(xarr, x, 0, xsize - 1);
+    }
+    if (ya != NULL) {
+        yi = gsl_interp_accel_find(ya, yarr, ysize, y);
+    }
+    else {
+        yi = gsl_interp_bsearch(yarr, y, 0, ysize - 1);
+    }
+    xmin = xarr[xi];
+    xmax = xarr[xi + 1];
+    ymin = yarr[yi];
+    ymax = yarr[yi + 1];
+    zminmin = zarr[INDEX_2D(xi, yi, xsize, ysize)];
+    zminmax = zarr[INDEX_2D(xi, yi + 1, xsize, ysize)];
+    zmaxmin = zarr[INDEX_2D(xi + 1, yi, xsize, ysize)];
+    zmaxmax = zarr[INDEX_2D(xi + 1, yi + 1, xsize, ysize)];
+    dx = xmax - xmin;
+    dy = ymax - ymin;
+    t = (x - xmin)/dx;
+    du = 1./dy; // partial u / partial y
+    *z_p = -(1.-t)*du*zminmin + -t*du*zmaxmin + (1.-t)*du*zminmax + t*du*zmaxmax;
+    return GSL_SUCCESS;
+}
+
+static int bilinear_deriv2(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
+    *z = 0.0;
+    return GSL_SUCCESS;
+}
+
 static const interp2d_type bilinear_type = {
     "bilinear",
     2,
     NULL,
     &bilinear_init,
     &bilinear_eval,
-    NULL, // derivatives: not yet implemented
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    &bilinear_deriv_x,
+    &bilinear_deriv_y,
+    &bilinear_deriv2,
+    &bilinear_deriv2,
+    &bilinear_deriv2,
     NULL
 };
 
