@@ -126,7 +126,7 @@ int interp2d_init(interp2d* interp, const double xa[], const double ya[], const 
 void interp2d_free(interp2d* interp);
 
 /**
- * Evaluate the interpolation object with the given data.
+ * Evaluate the interpolating function with the given data.
  * 
  * @param interp the interpolation object, previously initialized
  * @param xarr the x coordinates of the data, of length xsize
@@ -138,6 +138,76 @@ void interp2d_free(interp2d* interp);
  * @param ya the accelerator object for the y direction (may be NULL)
  */
 double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the x derivative of the interpolating function with the given data.
+ * 
+ * @param interp the interpolation object, previously initialized
+ * @param xarr the x coordinates of the data, of length xsize
+ * @param yarr the y coordinates of the data, of length ysize
+ * @param zarr the z coordinates of the data, of length xsize*ysize
+ * @param xsize the length of the array xa
+ * @param ysize the length of the array ya
+ * @param xa the accelerator object for the x direction (may be NULL)
+ * @param ya the accelerator object for the y direction (may be NULL)
+ */
+double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the y derivative of the interpolating function with the given data.
+ * 
+ * @param interp the interpolation object, previously initialized
+ * @param xarr the x coordinates of the data, of length xsize
+ * @param yarr the y coordinates of the data, of length ysize
+ * @param zarr the z coordinates of the data, of length xsize*ysize
+ * @param xsize the length of the array xa
+ * @param ysize the length of the array ya
+ * @param xa the accelerator object for the x direction (may be NULL)
+ * @param ya the accelerator object for the y direction (may be NULL)
+ */
+double interp2d_eval_deriv_y(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the second x derivative of the interpolating function with the given data.
+ * 
+ * @param interp the interpolation object, previously initialized
+ * @param xarr the x coordinates of the data, of length xsize
+ * @param yarr the y coordinates of the data, of length ysize
+ * @param zarr the z coordinates of the data, of length xsize*ysize
+ * @param xsize the length of the array xa
+ * @param ysize the length of the array ya
+ * @param xa the accelerator object for the x direction (may be NULL)
+ * @param ya the accelerator object for the y direction (may be NULL)
+ */
+double interp2d_eval_deriv_xx(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the second y derivative of the interpolating function with the given data.
+ * 
+ * @param interp the interpolation object, previously initialized
+ * @param xarr the x coordinates of the data, of length xsize
+ * @param yarr the y coordinates of the data, of length ysize
+ * @param zarr the z coordinates of the data, of length xsize*ysize
+ * @param xsize the length of the array xa
+ * @param ysize the length of the array ya
+ * @param xa the accelerator object for the x direction (may be NULL)
+ * @param ya the accelerator object for the y direction (may be NULL)
+ */
+double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the cross derivative of the interpolating function with the given data.
+ * 
+ * @param interp the interpolation object, previously initialized
+ * @param xarr the x coordinates of the data, of length xsize
+ * @param yarr the y coordinates of the data, of length ysize
+ * @param zarr the z coordinates of the data, of length xsize*ysize
+ * @param xsize the length of the array xa
+ * @param ysize the length of the array ya
+ * @param xa the accelerator object for the x direction (may be NULL)
+ * @param ya the accelerator object for the y direction (may be NULL)
+ */
+double interp2d_eval_deriv_xy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
 #define INDEX_2D(xi, yi, xsize, ysize) (xi) * (ysize) + (yi)
 

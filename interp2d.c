@@ -85,7 +85,10 @@ void interp2d_free(interp2d* interp) {
     free(interp);
 }
 
-double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+static inline double interp2d_eval_impl(
+    int (*evaluator)(const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z),
+    const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya
+) {
     double z;
     int status;
     if (x < interp->xmin || x > interp->xmax) {
@@ -94,9 +97,33 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
     if (y < interp->ymin || y > interp->ymax) {
         GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
     }
-    status = interp->type->eval(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, &z);
+    status = evaluator(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, &z);
     DISCARD_STATUS(status);
     return z;
+}
+
+double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_x, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_y(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_y, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_xx(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_xx, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_yy, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_xy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_xy, interp, xarr, yarr, zarr, x, y, xa, ya);
 }
 
 size_t interp2d_type_min_size(const interp2d_type* T) {
