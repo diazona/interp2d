@@ -25,7 +25,28 @@
 #include <gsl/gsl_test.h>
 #include "interp2d.h"
 
-int test_interp2d(const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, const double xval[], const double yval[], const double zval[], size_t test_size, const interp2d_type* T) {
+static inline int test_single(
+    double (*evaluator)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*),
+    const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, const double expected_results[], size_t i
+) {
+    if (expected_results != NULL) {
+        double result = evaluator(interp, xarr, yarr, zarr, x, y, xa, ya);
+        gsl_test_abs(result, expected_results[i], 1e-10, "%s %d", interp2d_name(interp), i);
+        return (fabs(result - expected_results[i]) > 1e-10) ? 1 : 0;
+    }
+    else {
+        return 0;
+    }
+}
+
+int test_interp2d(const double xarr[], const double yarr[], const double zarr[],    // interpolation data
+                  size_t xsize, size_t ysize,                                       // sizes of xarr and yarr
+                  const double xval[], const double yval[],                         // test points
+                  const double zval[],                                              // expected results
+                  const double zxval[], const double zyval[],
+                  const double zxxval[], const double zyyval[], const double zxyval[],
+                  size_t test_size,                                                 // number of test points
+                  const interp2d_type* T) {
     gsl_interp_accel *xa, *ya;
     int status = 0;
     size_t i;
@@ -40,12 +61,12 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
     for (i = 0; i < test_size; i++) {
         double x = xval[i];
         double y = yval[i];
-        double z;
-        z = interp2d_eval(interp, xarr, yarr, zarr, x, y, xa, ya);
-        gsl_test_abs(z, zval[i], 1e-10, "%s %d", interp2d_name(interp), i);
-        if (fabs(z - zval[i]) > 1e-10) {
-            status++;
-        }
+        test_single(&interp2d_eval, interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
+        test_single(&interp2d_eval_deriv_x, interp, xarr, yarr, zarr, x, y, xa, ya, zxval, i);
+        test_single(&interp2d_eval_deriv_y, interp, xarr, yarr, zarr, x, y, xa, ya, zyval, i);
+        test_single(&interp2d_eval_deriv_xx, interp, xarr, yarr, zarr, x, y, xa, ya, zxxval, i);
+        test_single(&interp2d_eval_deriv_yy, interp, xarr, yarr, zarr, x, y, xa, ya, zyyval, i);
+        test_single(&interp2d_eval_deriv_xy, interp, xarr, yarr, zarr, x, y, xa, ya, zxyval, i);
     }
     gsl_interp_accel_free(xa);
     gsl_interp_accel_free(ya);
@@ -67,7 +88,7 @@ int test_bilinear_symmetric() {
     size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
     size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
     size_t test_size = sizeof(xval) / sizeof(xval[0]);
-    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, test_size, interp2d_bilinear);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, NULL, NULL, NULL, NULL, NULL, test_size, interp2d_bilinear);
     gsl_test(status, "bilinear interpolation with symmetric values");
     return status;
 }
@@ -87,7 +108,7 @@ int test_bilinear_asymmetric_z() {
     size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
     size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
     size_t test_size = sizeof(xval) / sizeof(xval[0]);
-    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, test_size, interp2d_bilinear);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, NULL, NULL, NULL, NULL, NULL, test_size, interp2d_bilinear);
     gsl_test(status, "bilinear interpolation with asymmetric z values");
     return status;
 }
