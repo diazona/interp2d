@@ -53,20 +53,42 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
     return status;
 }
 
-int test_bilinear() {
+int test_bilinear_symmetric() {
     int status;
-    size_t size = 4, test_size = 6;
-    double xarr[4] = {0.0, 1.0, 2.0, 3.0};
-    double yarr[4] = {0.0, 1.0, 2.0, 3.0};
-    double zarr[16] = {1.0, 1.1, 1.2, 1.3,
-                        1.1, 1.2, 1.3, 1.4,
-                        1.2, 1.3, 1.4, 1.5,
-                        1.3, 1.4, 1.5, 1.6};
-    double xval[6] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
-    double yval[6] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
-    double zval[6] = {1.0, 1.1, 1.2, 1.3, 1.5, 1.6};
-    status = test_interp2d(xarr, yarr, zarr, size, size, xval, yval, zval, test_size, interp2d_bilinear);
-    gsl_test(status, "bilinear interpolation");
+    double xarr[] = {0.0, 1.0, 2.0, 3.0};
+    double yarr[] = {0.0, 1.0, 2.0, 3.0};
+    double zarr[] = {1.0, 1.1, 1.2, 1.3,
+                     1.1, 1.2, 1.3, 1.4,
+                     1.2, 1.3, 1.4, 1.5,
+                     1.3, 1.4, 1.5, 1.6};
+    double xval[] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
+    double yval[] = {0.0, 0.5, 1.0, 1.5, 2.5, 3.0};
+    double zval[] = {1.0, 1.1, 1.2, 1.3, 1.5, 1.6};
+    size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
+    size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
+    size_t test_size = sizeof(xval) / sizeof(xval[0]);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, test_size, interp2d_bilinear);
+    gsl_test(status, "bilinear interpolation with symmetric values");
+    return status;
+}
+
+int test_bilinear_asymmetric_z() {
+    int status;
+    double xarr[] = {0.0, 1.0, 2.0, 3.0};
+    double yarr[] = {0.0, 1.0, 2.0, 3.0};
+    double zarr[] = {1.0, 1.3, 1.5, 1.6,
+                     1.1, 1.4, 1.6, 1.9,
+                     1.2, 1.5, 1.7, 2.2,
+                     1.4, 1.7, 1.9, 2.3};
+    double xval[] = {0.0, 0.5, 1.0, 1.5,  2.5,   3.0,  1.3954,    1.6476,       0.824957,  2.41108,  2.98619,   1.36485};
+    double yval[] = {0.0, 0.5, 1.0, 1.5,  2.5,   3.0,  0.265371,  2.13849,      1.62114,   1.22198,  0.724681,  0.0596087};
+    // results computed using Mathematica 8.0.1
+    double zval[] = {1.0, 1.2, 1.4, 1.55, 2.025, 2.3,  1.2191513, 1.7242442248, 1.5067237, 1.626612, 1.6146423, 1.15436761};
+    size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
+    size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
+    size_t test_size = sizeof(xval) / sizeof(xval[0]);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval, test_size, interp2d_bilinear);
+    gsl_test(status, "bilinear interpolation with asymmetric z values");
     return status;
 }
 
@@ -74,6 +96,7 @@ int main(int argc, char** argv) {
     gsl_ieee_env_setup();
     argc = 0;
     argv = 0;
-    test_bilinear();
+    test_bilinear_symmetric();
+    test_bilinear_asymmetric_z();
     exit(gsl_test_summary());
 }
