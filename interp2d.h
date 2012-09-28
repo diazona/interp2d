@@ -35,7 +35,7 @@ extern "C" {
 typedef struct {
     /** The name of the algorithm. Use interp2d_name to access this field. */
     const char* name;
-    /** The minimum number of points required by the algorithm. Use interp2d_min_size to access this field. */
+    /** The minimum number of points in each dimension required by the algorithm. Use interp2d_min_size to access this field. */
     unsigned int min_size;
     /** The method that allocates memory for an interpolation object of this type. */
     void* (*alloc)(size_t size);
