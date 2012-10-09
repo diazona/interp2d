@@ -209,7 +209,11 @@ double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const
  */
 double interp2d_eval_deriv_xy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
-#define INDEX_2D(xi, yi, xsize, ysize) ((xi) * (ysize) + (yi))
+/**
+ * Compute the index into a 1D array for a given pair of x,y indices.
+ * This implements row-major ordering.
+ */
+#define INDEX_2D(xi, yi, xsize, ysize) ((yi) * (xsize) + (xi))
 
 #ifdef __cplusplus
 }
