@@ -1,3 +1,25 @@
+/*
+ * This file is part of interp2d, a GSL-compatible two-dimensional
+ * interpolation library. <http://www.ellipsix.net/interp2d.html>
+ * 
+ * Copyright 2012 David Zaslavsky
+ * Portions based on GNU GSL interpolation code,
+ *  copyright 1996, 1997, 1998, 1999, 2000, 2004 Gerard Jungman
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include "interp2d.h"
@@ -63,7 +85,10 @@ void interp2d_free(interp2d* interp) {
     free(interp);
 }
 
-double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+static inline double interp2d_eval_impl(
+    int (*evaluator)(const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z),
+    const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya
+) {
     double z;
     int status;
     if (x < interp->xmin || x > interp->xmax) {
@@ -72,9 +97,33 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
     if (y < interp->ymin || y > interp->ymax) {
         GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
     }
-    status = interp->type->eval(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, &z);
+    status = evaluator(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, &z);
     DISCARD_STATUS(status);
     return z;
+}
+
+double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_x, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_y(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_y, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_xx(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_xx, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_yy, interp, xarr, yarr, zarr, x, y, xa, ya);
+}
+
+double interp2d_eval_deriv_xy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    return interp2d_eval_impl(interp->type->eval_deriv_xy, interp, xarr, yarr, zarr, x, y, xa, ya);
 }
 
 size_t interp2d_type_min_size(const interp2d_type* T) {
