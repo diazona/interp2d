@@ -38,7 +38,7 @@ typedef struct {
     /** The minimum number of points in each dimension required by the algorithm. Use interp2d_min_size to access this field. */
     unsigned int min_size;
     /** The method that allocates memory for an interpolation object of this type. */
-    void* (*alloc)(size_t size);
+    void* (*alloc)(size_t xsize, size_t ysize);
     /** The method that initializes the interpolation type. */ 
     int (*init)(void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize);
     /** The method that evaluates the interpolation at the given point. */
