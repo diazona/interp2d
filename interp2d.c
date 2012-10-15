@@ -42,7 +42,7 @@ interp2d* interp2d_alloc(const interp2d_type* T, size_t xsize, size_t ysize) {
         interp->state = NULL;
         return interp;
     }
-    interp->state = interp->type->alloc(xsize);
+    interp->state = interp->type->alloc(xsize, ysize);
     if (interp->state == NULL) {
         free(interp);
         GSL_ERROR_NULL("failed to allocate space for interp2d state", GSL_ENOMEM);
