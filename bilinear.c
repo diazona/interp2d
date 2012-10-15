@@ -90,7 +90,7 @@ static int bilinear_deriv_x(const void* state, const double xarr[], const double
     dy = ymax - ymin;
     dt = 1./dx; // partial t / partial x
     u = (y - ymin)/dy;
-    *z_p = -dt*(1.-u)*zminmin + dt*(1.-u)*zmaxmin - dt*u*zminmax + dt*u*zmaxmax;
+    *z_p = dt*(-(1.-u)*zminmin + (1.-u)*zmaxmin - u*zminmax + u*zmaxmax);
     return GSL_SUCCESS;
 }
 
@@ -123,7 +123,7 @@ static int bilinear_deriv_y(const void* state, const double xarr[], const double
     dy = ymax - ymin;
     t = (x - xmin)/dx;
     du = 1./dy; // partial u / partial y
-    *z_p = -(1.-t)*du*zminmin + -t*du*zmaxmin + (1.-t)*du*zminmax + t*du*zmaxmax;
+    *z_p = du*(-(1.-t)*zminmin - t*zmaxmin + (1.-t)*zminmax + t*zmaxmax);
     return GSL_SUCCESS;
 }
 
