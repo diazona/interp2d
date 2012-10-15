@@ -127,8 +127,8 @@ static int bilinear_deriv_y(const void* state, const double xarr[], const double
     return GSL_SUCCESS;
 }
 
-static int bilinear_deriv2(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
-    *z = 0.0;
+static int bilinear_deriv2(const void* state, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z_pp) {
+    *z_pp = 0.0;
     return GSL_SUCCESS;
 }
 
