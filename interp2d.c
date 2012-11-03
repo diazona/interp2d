@@ -92,10 +92,14 @@ static inline double interp2d_eval_impl(
     double z;
     int status;
     if (x < interp->xmin || x > interp->xmax) {
-        GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
+        char errmsg[80];
+        snprintf(errmsg, 80, "x value %g not in range %g to %g", x, interp->xmin, interp->xmax);
+        GSL_ERROR_VAL(errmsg, GSL_EDOM, GSL_NAN);
     }
     if (y < interp->ymin || y > interp->ymax) {
-        GSL_ERROR_VAL("interpolation error", GSL_EDOM, GSL_NAN);
+        char errmsg[80];
+        snprintf(errmsg, 80, "y value %g not in range %g to %g", y, interp->ymin, interp->ymax);
+        GSL_ERROR_VAL(errmsg, GSL_EDOM, GSL_NAN);
     }
     status = evaluator(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, &z);
     DISCARD_STATUS(status);
