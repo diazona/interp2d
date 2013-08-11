@@ -25,6 +25,11 @@
 #include <gsl/gsl_test.h>
 #include "interp2d.h"
 
+/**
+ * Tests a single evaluator function.
+ * 
+ * See test_interp2d in this file for usage examples.
+ */
 static inline int test_single(
     double (*evaluator)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*),
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, const double expected_results[], size_t i
@@ -39,6 +44,25 @@ static inline int test_single(
     }
 }
 
+/**
+ * Test a given interpolation type a given number of times.
+ * 
+ * @param xarr the x values of the points that define the function
+ * @param yarr the y values of the points that define the function
+ * @param zarr the values of the function at the points specified by xarr and yarr
+ * @param xsize the length of xarr
+ * @param ysize the length of yarr
+ * @param xval the x values of points at which to calculate interpolated values
+ * @param yval the y values of points at which to calculate interpolated values
+ * @param zval the expected results of the interpolations
+ * @param zxval the expected results of the x derivative calculations
+ * @param zyval the expected results of the y derivative calculations
+ * @param zxxval the expected results of the xx derivative calculations
+ * @param zyyval the expected results of the yy derivative calculations
+ * @param zxyval the expected results of the xy derivative calculations
+ * @param test_size the length of xval, yval, zval, etc.
+ * @param T the interpolation type
+ */
 int test_interp2d(const double xarr[], const double yarr[], const double zarr[],    // interpolation data
                   size_t xsize, size_t ysize,                                       // sizes of xarr and yarr
                   const double xval[], const double yval[],                         // test points
@@ -74,6 +98,11 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
     return status;
 }
 
+/**
+ * Tests bilinear interpolation using a symmetric function, f(x,y)==f(y,x),
+ * and diagonal interpolation points (x,y) where x==y. If these tests don't pass,
+ * something is seriously broken.
+ */
 int test_bilinear_symmetric() {
     int status;
     double xarr[] = {0.0, 1.0, 2.0, 3.0};
@@ -93,6 +122,11 @@ int test_bilinear_symmetric() {
     return status;
 }
 
+/**
+ * Tests bilinear interpolation using an asymmetric function, f(x,y)!=f(y,x),
+ * and off-diagonal interpolation points (x,y) where x and y may or may not be
+ * equal.
+ */
 int test_bilinear_asymmetric_z() {
     int status;
     double xarr[] = {0.0, 1.0, 2.0, 3.0};
@@ -103,7 +137,7 @@ int test_bilinear_asymmetric_z() {
                      1.6, 1.9, 2.2, 2.3};
     double xval[] = {0.0, 0.5, 1.0, 1.5,  2.5,   3.0,  1.3954,    1.6476,       0.824957,  2.41108,  2.98619,   1.36485};
     double yval[] = {0.0, 0.5, 1.0, 1.5,  2.5,   3.0,  0.265371,  2.13849,      1.62114,   1.22198,  0.724681,  0.0596087};
-    // results computed using Mathematica 8.0.1
+    // results computed using Mathematica 9.0.1.0
     double zval[] = {1.0, 1.2, 1.4, 1.55, 2.025, 2.3,  1.2191513, 1.7242442248, 1.5067237, 1.626612, 1.6146423, 1.15436761};
     size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
     size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
@@ -113,6 +147,9 @@ int test_bilinear_asymmetric_z() {
     return status;
 }
 
+/**
+ * Runs all the tests.
+ */
 int main(int argc, char** argv) {
     gsl_ieee_env_setup();
     argc = 0;
