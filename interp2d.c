@@ -24,6 +24,10 @@
 #include <gsl/gsl_math.h>
 #include "interp2d.h"
 
+/**
+ * Triggers a GSL error if the argument is not equal to GSL_SUCCESS.
+ * If the argument is GSL_SUCCESS, this does nothing.
+ */
 #define DISCARD_STATUS(s) if ((s) != GSL_SUCCESS) { GSL_ERROR_VAL("interpolation error", (s),  GSL_NAN); }
 
 interp2d* interp2d_alloc(const interp2d_type* T, size_t xsize, size_t ysize) {
@@ -85,6 +89,11 @@ void interp2d_free(interp2d* interp) {
     free(interp);
 }
 
+/**
+ * A wrapper function that checks boundary conditions, calls an evaluator
+ * which implements the actual calculation of the function value or 
+ * derivative etc., and checks the return status.
+ */
 static inline double interp2d_eval_impl(
     int (*evaluator)(const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z),
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya
