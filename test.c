@@ -115,18 +115,44 @@ int test_bilinear_asymmetric_z() {
 
 void test_bicubic() {
     int status;
-    size_t size = 4, test_size = 3;
-    double xarr[4] = {0.0, 1.0, 2.0, 3.0};
-    double yarr[4] = {0.0, 1.0, 2.0, 3.0};
-    double zarr[16] = {1.0, 1.1, 1.2, 1.3,
-                        1.1, 1.2, 1.3, 1.4,
-                        1.2, 1.3, 1.4, 1.5,
-                        1.3, 1.4, 1.5, 1.6};
-    double xval[6] = {1.0, 1.5, 2.0};
-    double yval[6] = {1.0, 1.5, 2.0};
-    double zval[6] = {1.2, 1.3, 1.4};
-    status = test_interp2d(xarr, yarr, zarr, size, size, xval, yval, zval, test_size, interp2d_bicubic);
+    double xarr[] = {0.0, 1.0, 2.0, 3.0};
+    double yarr[] = {0.0, 1.0, 2.0, 3.0};
+    double zarr[] = {1.0, 1.1, 1.2, 1.3,
+                     1.1, 1.2, 1.3, 1.4,
+                     1.2, 1.3, 1.4, 1.5,
+                     1.3, 1.4, 1.5, 1.6};
+    double xval[] = {1.0, 1.5, 2.0};
+    double yval[] = {1.0, 1.5, 2.0};
+    double zval[] = {1.2, 1.3, 1.4};
+    size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
+    size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
+    size_t test_size = sizeof(xval) / sizeof(xval[0]);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval,  NULL, NULL, NULL, NULL, NULL, test_size, interp2d_bicubic);
     gsl_test(status, "bicubic interpolation on linear function");
+}
+
+int test_bicubic_nonlinear() {
+    int status;
+    double xarr[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    double yarr[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    double zarr[] = { 1,  2,  3,  4,  5,  6,  7,  8, // least common multiple of x and y
+                      2,  2,  6,  4, 10,  6, 14,  8,
+                      3,  6,  3, 12, 15,  6, 21, 24,
+                      4,  4, 12,  4, 20, 12, 28,  8,
+                      5, 10, 15, 20,  5, 30, 35, 40,
+                      6,  6,  6, 12, 30,  6, 42, 24,
+                      7, 14, 21, 28, 35, 42,  7, 56,
+                      8,  8, 24,  8, 40, 24, 56,  8};
+    double xval[] = {1.4, 2.3, 4.7, 3.3, 7.5, 6.6, 5.1};
+    double yval[] = {1.0, 1.8, 1.9, 2.5, 2.7, 4.1, 3.3};
+    // results computed using GSL 1D cubic interpolation twice
+    double zval[] = {1.4, 3.11183531264736, 8.27114315792559, 5.03218982537718, 22.13230634702637, 23.63206834997871, 17.28553080971182};
+    size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
+    size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
+    size_t test_size = sizeof(xval) / sizeof(xval[0]);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval,  NULL, NULL, NULL, NULL, NULL, test_size, interp2d_bicubic);
+    gsl_test(status, "bicubic interpolation on nonlinear symmetric function");
+    return status;
 }
 
 int main(int argc, char** argv) {
@@ -136,5 +162,6 @@ int main(int argc, char** argv) {
     test_bilinear_symmetric();
     test_bilinear_asymmetric_z();
     test_bicubic();
+    test_bicubic_nonlinear();
     exit(gsl_test_summary());
 }
