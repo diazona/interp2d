@@ -15,7 +15,7 @@ if(DOXYGEN_FOUND)
                     COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
 
-add_library(interp2d bilinear.c interp2d.c)
+add_library(interp2d bilinear.c bicubic.c interp2d.c)
 
 add_executable(interp2dtest test.c)
 target_link_libraries(interp2dtest m gsl interp2d)
