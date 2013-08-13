@@ -45,16 +45,17 @@ static inline int test_single(
 }
 
 /**
- * Test a given interpolation type a given number of times.
+ * Tests that a given interpolation type reproduces the data points it is given,
+ * and then tests that it correctly reproduces additional values.
  * 
  * @param xarr the x values of the points that define the function
  * @param yarr the y values of the points that define the function
  * @param zarr the values of the function at the points specified by xarr and yarr
  * @param xsize the length of xarr
  * @param ysize the length of yarr
- * @param xval the x values of points at which to calculate interpolated values
- * @param yval the y values of points at which to calculate interpolated values
- * @param zval the expected results of the interpolations
+ * @param xval the x values of additional points at which to calculate interpolated values
+ * @param yval the y values of additional points at which to calculate interpolated values
+ * @param zval the expected results of the additional interpolations
  * @param zxval the expected results of the x derivative calculations
  * @param zyval the expected results of the y derivative calculations
  * @param zxxval the expected results of the xx derivative calculations
@@ -73,7 +74,7 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
                   const interp2d_type* T) {
     gsl_interp_accel *xa, *ya;
     int status = 0;
-    size_t i;
+    size_t xi, yi, zi, i;
 
     xa = gsl_interp_accel_alloc();
     ya = gsl_interp_accel_alloc();
@@ -82,6 +83,17 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
     
     gsl_test_int(min_size, T->min_size, "interp2d_type_min_size on %s", interp2d_name(interp));
     interp2d_init(interp, xarr, yarr, zarr, xsize, ysize);
+    // First check that the interpolation reproduces the given points
+    for (xi = 0; xi < xsize; xi++) {
+        double x = xarr[xi];
+        for (yi = 0; yi < ysize; yi++) {
+            double y = yarr[yi];
+            
+            zi = INDEX_2D(xi, yi, xsize, ysize);
+            test_single(&interp2d_eval, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+        }
+    }
+    // Then check additional points provided
     for (i = 0; i < test_size; i++) {
         double x = xval[i];
         double y = yval[i];
