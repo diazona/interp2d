@@ -209,6 +209,31 @@ void interp2d_free(interp2d* interp);
 double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
 /**
+ * Evaluate the interpolating function at the point `(x,y)`.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the value of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
+
+/**
  * Evaluate the x derivative of the interpolating function at `(x,y)`.
  * 
  * @param[in] interp the interpolation object, which should have already
@@ -230,6 +255,31 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
  * @return the x derivative of the interpolating function at `(x,y)`
  */
 double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the x derivative of the interpolating function at `(x,y)`.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the x derivative of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_deriv_x_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
 
 /**
  * Evaluate the y derivative of the interpolating function at `(x,y)`.
@@ -255,6 +305,31 @@ double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const 
 double interp2d_eval_deriv_y(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
 /**
+ * Evaluate the y derivative of the interpolating function at `(x,y)`.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the y derivative of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_deriv_y_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
+
+/**
  * Evaluate the second x derivative of the interpolating function at `(x,y)`.
  * 
  * @param[in] interp the interpolation object, which should have already
@@ -276,6 +351,31 @@ double interp2d_eval_deriv_y(const interp2d* interp, const double xarr[], const 
  * @return the second x derivative of the interpolating function at `(x,y)`
  */
 double interp2d_eval_deriv_xx(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the second x derivative of the interpolating function at `(x,y)`.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the second x derivative of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_deriv_xx_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
 
 /**
  * Evaluate the second y derivative of the interpolating function at `(x,y)`.
@@ -301,6 +401,31 @@ double interp2d_eval_deriv_xx(const interp2d* interp, const double xarr[], const
 double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
 /**
+ * Evaluate the second y derivative of the interpolating function at `(x,y)`.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the second y derivative of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_deriv_yy_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
+
+/**
  * Evaluate the cross derivative of the interpolating function at `(x,y)`.
  * This is \f$\partial_{xy}f(x,y)\f$.
  * 
@@ -323,6 +448,32 @@ double interp2d_eval_deriv_yy(const interp2d* interp, const double xarr[], const
  * @return the cross derivative of the interpolating function at `(x,y)`
  */
 double interp2d_eval_deriv_xy(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
+ * Evaluate the cross derivative of the interpolating function at `(x,y)`.
+ * This is \f$\partial_{xy}f(x,y)\f$.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the cross derivative of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_deriv_xy_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
 
 /**
  * Compute the index into a 1D array for a given pair of `x,y` indices.
