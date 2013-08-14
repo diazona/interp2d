@@ -21,6 +21,7 @@
  */
 
 #include <math.h>
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_ieee_utils.h>
 #include <gsl/gsl_test.h>
 #include "interp2d.h"
@@ -32,12 +33,30 @@
  */
 static inline int test_single(
     double (*evaluator)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*),
+    int (*evaluator_e)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*, double*),
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, const double expected_results[], size_t i
 ) {
     if (expected_results != NULL) {
+        int failures = 0;
+        int status;
         double result = evaluator(interp, xarr, yarr, zarr, x, y, xa, ya);
         gsl_test_abs(result, expected_results[i], 1e-10, "%s %d", interp2d_name(interp), i);
-        return (fabs(result - expected_results[i]) > 1e-10) ? 1 : 0;
+        if (fabs(result - expected_results[i]) > 1e-10) {
+            // test failed
+            failures++;
+        }
+        status = evaluator_e(interp, xarr, yarr, zarr, x, y, xa, ya, &result);
+        if (status != GSL_SUCCESS) {
+            // something went wrong
+            failures++;
+        }
+        else {
+            gsl_test_abs(result, expected_results[i], 1e-10, "%s (e) %d", interp2d_name(interp), i);
+            if (fabs(result - expected_results[i]) > 1e-10) {
+                // test failed - wrong result
+                failures++;
+            }
+        }
     }
     else {
         return 0;
@@ -90,19 +109,19 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
             double y = yarr[yi];
             
             zi = INDEX_2D(xi, yi, xsize, ysize);
-            test_single(&interp2d_eval, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+            test_single(&interp2d_eval, &interp2d_eval_e, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
         }
     }
     // Then check additional points provided
     for (i = 0; i < test_size; i++) {
         double x = xval[i];
         double y = yval[i];
-        test_single(&interp2d_eval, interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
-        test_single(&interp2d_eval_deriv_x, interp, xarr, yarr, zarr, x, y, xa, ya, zxval, i);
-        test_single(&interp2d_eval_deriv_y, interp, xarr, yarr, zarr, x, y, xa, ya, zyval, i);
-        test_single(&interp2d_eval_deriv_xx, interp, xarr, yarr, zarr, x, y, xa, ya, zxxval, i);
-        test_single(&interp2d_eval_deriv_yy, interp, xarr, yarr, zarr, x, y, xa, ya, zyyval, i);
-        test_single(&interp2d_eval_deriv_xy, interp, xarr, yarr, zarr, x, y, xa, ya, zxyval, i);
+        test_single(&interp2d_eval,         &interp2d_eval_e,          interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
+        test_single(&interp2d_eval_deriv_x, &interp2d_eval_deriv_x_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zxval, i);
+        test_single(&interp2d_eval_deriv_y, &interp2d_eval_deriv_y_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zyval, i);
+        test_single(&interp2d_eval_deriv_xx,&interp2d_eval_deriv_xx_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxxval, i);
+        test_single(&interp2d_eval_deriv_yy,&interp2d_eval_deriv_yy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zyyval, i);
+        test_single(&interp2d_eval_deriv_xy,&interp2d_eval_deriv_xy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxyval, i);
     }
     gsl_interp_accel_free(xa);
     gsl_interp_accel_free(ya);
