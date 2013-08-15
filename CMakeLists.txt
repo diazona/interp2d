@@ -16,6 +16,8 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 add_library(interp2d bilinear.c bicubic.c interp2d.c)
+install(TARGETS interp2d DESTINATION lib)
+install(FILES interp2d.h DESTINATION include)
 
 add_executable(interp2dtest test.c)
 target_link_libraries(interp2dtest m gsl interp2d)
