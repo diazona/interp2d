@@ -25,13 +25,14 @@
 #include <gsl/gsl_ieee_utils.h>
 #include <gsl/gsl_test.h>
 #include "interp2d.h"
+#include "interp2d_spline.h"
 
 /**
- * Tests a single evaluator function.
+ * Tests a single evaluator function from the low-level interface.
  * 
  * See test_interp2d in this file for usage examples.
  */
-static inline int test_single(
+static inline int test_single_low_level(
     double (*evaluator)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*),
     int (*evaluator_e)(const interp2d*, const double[], const double[], const double[], const double, const double, gsl_interp_accel*, gsl_interp_accel*, double*),
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, const double expected_results[], size_t i
@@ -40,7 +41,7 @@ static inline int test_single(
         int failures = 0;
         int status;
         double result = evaluator(interp, xarr, yarr, zarr, x, y, xa, ya);
-        gsl_test_abs(result, expected_results[i], 1e-10, "%s %d", interp2d_name(interp), i);
+        gsl_test_abs(result, expected_results[i], 1e-10, "high level %s %d", interp2d_name(interp), i);
         if (fabs(result - expected_results[i]) > 1e-10) {
             // test failed
             failures++;
@@ -51,7 +52,44 @@ static inline int test_single(
             failures++;
         }
         else {
-            gsl_test_abs(result, expected_results[i], 1e-10, "%s (e) %d", interp2d_name(interp), i);
+            gsl_test_abs(result, expected_results[i], 1e-10, "high level POSIX %s %d", interp2d_name(interp), i);
+            if (fabs(result - expected_results[i]) > 1e-10) {
+                // test failed - wrong result
+                failures++;
+            }
+        }
+    }
+    else {
+        return 0;
+    }
+}
+
+/**
+ * Tests a single evaluator function from the high-level interface.
+ * 
+ * See test_interp2d in this file for usage examples.
+ */
+static inline int test_single_high_level(
+    double (*evaluator)(const interp2d_spline*, const double, const double, gsl_interp_accel*, gsl_interp_accel*),
+    int (*evaluator_e)(const interp2d_spline*, const double, const double, gsl_interp_accel*, gsl_interp_accel*, double*),
+    const interp2d_spline* interp, const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, const double expected_results[], size_t i
+) {
+    if (expected_results != NULL) {
+        int failures = 0;
+        int status;
+        double result = evaluator(interp, x, y, xa, ya);
+        gsl_test_abs(result, expected_results[i], 1e-10, "high level %s %d", interp2d_spline_name(interp), i);
+        if (fabs(result - expected_results[i]) > 1e-10) {
+            // test failed
+            failures++;
+        }
+        status = evaluator_e(interp, x, y, xa, ya, &result);
+        if (status != GSL_SUCCESS) {
+            // something went wrong
+            failures++;
+        }
+        else {
+            gsl_test_abs(result, expected_results[i], 1e-10, "high level POSIX %s %d", interp2d_spline_name(interp), i);
             if (fabs(result - expected_results[i]) > 1e-10) {
                 // test failed - wrong result
                 failures++;
@@ -98,10 +136,13 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
     xa = gsl_interp_accel_alloc();
     ya = gsl_interp_accel_alloc();
     interp2d* interp = interp2d_alloc(T, xsize, ysize);
+    interp2d_spline* interp_s = interp2d_spline_alloc(T, xsize, ysize);
+
     unsigned int min_size = interp2d_type_min_size(T);
-    
     gsl_test_int(min_size, T->min_size, "interp2d_type_min_size on %s", interp2d_name(interp));
+
     interp2d_init(interp, xarr, yarr, zarr, xsize, ysize);
+    interp2d_spline_init(interp_s, xarr, yarr, zarr, xsize, ysize);
     // First check that the interpolation reproduces the given points
     for (xi = 0; xi < xsize; xi++) {
         double x = xarr[xi];
@@ -109,19 +150,28 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
             double y = yarr[yi];
             
             zi = INDEX_2D(xi, yi, xsize, ysize);
-            test_single(&interp2d_eval, &interp2d_eval_e, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+            test_single_low_level(&interp2d_eval, &interp2d_eval_e, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+            test_single_high_level(&interp2d_spline_eval, &interp2d_spline_eval_e, interp_s, x, y, xa, ya, zarr, zi);
         }
     }
     // Then check additional points provided
     for (i = 0; i < test_size; i++) {
         double x = xval[i];
         double y = yval[i];
-        test_single(&interp2d_eval,         &interp2d_eval_e,          interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
-        test_single(&interp2d_eval_deriv_x, &interp2d_eval_deriv_x_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zxval, i);
-        test_single(&interp2d_eval_deriv_y, &interp2d_eval_deriv_y_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zyval, i);
-        test_single(&interp2d_eval_deriv_xx,&interp2d_eval_deriv_xx_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxxval, i);
-        test_single(&interp2d_eval_deriv_yy,&interp2d_eval_deriv_yy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zyyval, i);
-        test_single(&interp2d_eval_deriv_xy,&interp2d_eval_deriv_xy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxyval, i);
+        
+        test_single_low_level(&interp2d_eval,         &interp2d_eval_e,          interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
+        test_single_low_level(&interp2d_eval_deriv_x, &interp2d_eval_deriv_x_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zxval, i);
+        test_single_low_level(&interp2d_eval_deriv_y, &interp2d_eval_deriv_y_e,  interp, xarr, yarr, zarr, x, y, xa, ya, zyval, i);
+        test_single_low_level(&interp2d_eval_deriv_xx,&interp2d_eval_deriv_xx_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxxval, i);
+        test_single_low_level(&interp2d_eval_deriv_yy,&interp2d_eval_deriv_yy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zyyval, i);
+        test_single_low_level(&interp2d_eval_deriv_xy,&interp2d_eval_deriv_xy_e, interp, xarr, yarr, zarr, x, y, xa, ya, zxyval, i);
+        
+        test_single_high_level(&interp2d_spline_eval,         &interp2d_spline_eval_e,          interp_s, x, y, xa, ya, zval, i);
+        test_single_high_level(&interp2d_spline_eval_deriv_x, &interp2d_spline_eval_deriv_x_e,  interp_s, x, y, xa, ya, zxval, i);
+        test_single_high_level(&interp2d_spline_eval_deriv_y, &interp2d_spline_eval_deriv_y_e,  interp_s, x, y, xa, ya, zyval, i);
+        test_single_high_level(&interp2d_spline_eval_deriv_xx,&interp2d_spline_eval_deriv_xx_e, interp_s, x, y, xa, ya, zxxval, i);
+        test_single_high_level(&interp2d_spline_eval_deriv_yy,&interp2d_spline_eval_deriv_yy_e, interp_s, x, y, xa, ya, zyyval, i);
+        test_single_high_level(&interp2d_spline_eval_deriv_xy,&interp2d_spline_eval_deriv_xy_e, interp_s, x, y, xa, ya, zxyval, i);
     }
     gsl_interp_accel_free(xa);
     gsl_interp_accel_free(ya);
