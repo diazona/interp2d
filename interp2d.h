@@ -21,11 +21,12 @@
  */
 /** 
  * @file interp2d.h
- * @brief The one header file you need to include.
+ * @brief Public interface for low-level 2D interpolation functions
  * 
- * This is pretty much the entire public interface to the `%interp2d` library.
- * You only use the functions in this file, unless you're creating a new
- * interpolation type.
+ * This is the public interface to the low-level functions of the
+ * `%interp2d` library, i.e. the functions that don't store the data arrays.
+ * If you're using the low-level interface, you only use the functions in
+ * this file, unless you're creating a new interpolation type.
  * 
  * The typical workflow is
  * 
@@ -34,6 +35,8 @@
  * 3. evaluate the interpolating function or its derivatives using
  *    interp2d_eval() or its counterparts, possibly many times
  * 4. free the memory using interp2d_free()
+ * 
+ * @see interp2d_spline.h
  */
 
 #ifndef __INTERP_2D_H__

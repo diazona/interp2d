@@ -15,9 +15,9 @@ if(DOXYGEN_FOUND)
                     COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
 
-add_library(interp2d bilinear.c bicubic.c interp2d.c)
+add_library(interp2d bilinear.c bicubic.c interp2d.c interp2d_spline.c)
 install(TARGETS interp2d DESTINATION lib)
-install(FILES interp2d.h DESTINATION include)
+install(FILES interp2d.h interp2d_spline.h DESTINATION include)
 
 add_executable(interp2dtest test.c)
 target_link_libraries(interp2dtest m gsl interp2d)
