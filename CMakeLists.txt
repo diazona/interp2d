@@ -21,3 +21,6 @@ install(FILES interp2d.h interp2d_spline.h DESTINATION include)
 
 add_executable(interp2dtest test.c)
 target_link_libraries(interp2dtest m gsl interp2d)
+
+enable_testing()
+add_test(all interp2dtest)
