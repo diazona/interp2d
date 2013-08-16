@@ -40,17 +40,18 @@ interp2d_spline* interp2d_spline_alloc(const interp2d_type* T, size_t xsize, siz
     interp->interp_object.ysize = ysize;
     if (interp->interp_object.type->alloc == NULL) {
         interp->interp_object.state = NULL;
-        return interp;
     }
-    interp->interp_object.state = interp->interp_object.type->alloc(xsize, ysize);
-    if (interp->interp_object.state == NULL) {
-        free(interp);
-        GSL_ERROR_NULL("failed to allocate space for interp2d_spline state", GSL_ENOMEM);
+    else {
+        interp->interp_object.state = interp->interp_object.type->alloc(xsize, ysize);
+        if (interp->interp_object.state == NULL) {
+            free(interp);
+            GSL_ERROR_NULL("failed to allocate space for interp2d_spline state", GSL_ENOMEM);
+        }
     }
     // Use one contiguous block of memory for all three data arrays.
     // That way the code fails immediately if there isn't sufficient space for everything,
     // rather than allocating one or two and then having to free them.
-    array_mem = (double*)malloc(xsize + ysize + xsize * ysize);
+    array_mem = (double*)calloc(xsize + ysize + xsize * ysize, sizeof(double));
     if (array_mem == NULL) {
         interp->interp_object.type->free(interp->interp_object.state);
         free(interp);
@@ -64,9 +65,9 @@ interp2d_spline* interp2d_spline_alloc(const interp2d_type* T, size_t xsize, siz
 
 int interp2d_spline_init(interp2d_spline* interp, const double xarr[], const double yarr[], const double zarr[], size_t xsize, size_t ysize) {
     int status = interp2d_init(&(interp->interp_object), xarr, yarr, zarr, xsize, ysize);
-    memcpy(interp->xarr, xarr, xsize);
-    memcpy(interp->yarr, yarr, ysize);
-    memcpy(interp->zarr, zarr, xsize * ysize);
+    memcpy(interp->xarr, xarr, xsize * sizeof(double));
+    memcpy(interp->yarr, yarr, ysize * sizeof(double));
+    memcpy(interp->zarr, zarr, xsize * ysize * sizeof(double));
     return status;
 }
 

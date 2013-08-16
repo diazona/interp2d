@@ -286,6 +286,19 @@ double interp2d_spline_eval_deriv_xy(const interp2d_spline* interp, const double
  */
 int interp2d_spline_eval_deriv_xy_e(const interp2d_spline* interp, const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
 
+/**
+ * Return the minimum number of points in each dimension needed by the
+ * type of the given interpolation object. This just accesses the type
+ * from `interp` and calls interp2d_type_min_size() on it.
+ */
+size_t interp2d_spline_min_size(const interp2d_spline* interp);
+
+/**
+ * Return the type name of the given interpolation. This just accesses
+ * the type object from `interp` and returns its name.
+ */
+const char* interp2d_spline_name(const interp2d_spline* interp);
+
 #ifdef __cplusplus
 }
 #endif
