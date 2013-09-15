@@ -7,6 +7,12 @@ endif(COMMAND cmake_policy)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+find_package(GSL REQUIRED)
+include_directories(${GSL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${GSL_LIBRARIES})
+
+set(LIBS ${LIBS} m)
+
 # Code snippet from http://majewsky.wordpress.com/2010/08/14/tip-of-the-day-cmake-and-doxygen/
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -22,7 +28,7 @@ install(TARGETS interp2d DESTINATION lib)
 install(FILES interp2d.h interp2d_spline.h DESTINATION include)
 
 add_executable(interp2dtest test.c)
-target_link_libraries(interp2dtest m gsl interp2d)
+target_link_libraries(interp2dtest interp2d ${LIBS})
 
 enable_testing()
 add_test(all interp2dtest)
