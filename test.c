@@ -41,7 +41,7 @@ static inline int test_single_low_level(
         int failures = 0;
         int status;
         double result = evaluator(interp, xarr, yarr, zarr, x, y, xa, ya);
-        gsl_test_abs(result, expected_results[i], 1e-10, "high level %s %d", interp2d_name(interp), i);
+        gsl_test_abs(result, expected_results[i], 1e-10, "low level %s %d", interp2d_name(interp), i);
         if (fabs(result - expected_results[i]) > 1e-10) {
             // test failed
             failures++;
@@ -52,7 +52,7 @@ static inline int test_single_low_level(
             failures++;
         }
         else {
-            gsl_test_abs(result, expected_results[i], 1e-10, "high level POSIX %s %d", interp2d_name(interp), i);
+            gsl_test_abs(result, expected_results[i], 1e-10, "low level POSIX %s %d", interp2d_name(interp), i);
             if (fabs(result - expected_results[i]) > 1e-10) {
                 // test failed - wrong result
                 failures++;
