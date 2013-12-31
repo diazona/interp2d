@@ -99,7 +99,6 @@ static inline int interp2d_eval_impl(
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya,
     double* result
 ) {
-    int status;
     if (x < interp->xmin || x > interp->xmax) {
         char errmsg[80];
         snprintf(errmsg, 80, "x value %g not in range %g to %g", x, interp->xmin, interp->xmax);
