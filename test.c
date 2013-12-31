@@ -151,6 +151,7 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
             
             zi = INDEX_2D(xi, yi, xsize, ysize);
             test_single_low_level(&interp2d_eval, &interp2d_eval_e, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+            test_single_low_level(&interp2d_eval_no_boundary_check, &interp2d_eval_e_no_boundary_check, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
             test_single_high_level(&interp2d_spline_eval, &interp2d_spline_eval_e, interp_s, x, y, xa, ya, zarr, zi);
         }
     }
@@ -172,6 +173,8 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
         test_single_high_level(&interp2d_spline_eval_deriv_xx,&interp2d_spline_eval_deriv_xx_e, interp_s, x, y, xa, ya, zxxval, i);
         test_single_high_level(&interp2d_spline_eval_deriv_yy,&interp2d_spline_eval_deriv_yy_e, interp_s, x, y, xa, ya, zyyval, i);
         test_single_high_level(&interp2d_spline_eval_deriv_xy,&interp2d_spline_eval_deriv_xy_e, interp_s, x, y, xa, ya, zxyval, i);
+
+        test_single_low_level(&interp2d_eval_no_boundary_check, &interp2d_eval_e_no_boundary_check, interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
     }
     gsl_interp_accel_free(xa);
     gsl_interp_accel_free(ya);
