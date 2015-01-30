@@ -658,7 +658,7 @@ L680:
         double q1d = *p11 + dy * (2. * *p12 + 3. * dy * *p13);
         double q2d = *p21 + dy * (2. * *p22 + 3. * dy * *p23);
         double q3d = *p31 + dy * (2. * *p32 + 3. * dy * *p33);
-        if (zy) {
+        if (z_y) {
             double q0d = *p01 + dy * (2. * *p02 + 3. * dy * *p03);
             *z_y = q0d + dx * (q1d + dx * (q2d + dx * q3d));
         }
