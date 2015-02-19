@@ -212,6 +212,33 @@ void interp2d_free(interp2d* interp);
 double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
 
 /**
+ * Evaluate the interpolating function at the point `(x,y)`, without checking
+ * whether `(x,y)` is within the bounds of the interpolation. This function
+ * can be used for extrapolation - but do so at your own risk! Extrapolation
+ * quickly loses its predictive value as you move away from the region in which
+ * function values are known.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @return the value of the interpolating function at `(x,y)`
+ */
+double interp2d_eval_no_boundary_check(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya);
+
+/**
  * Evaluate the interpolating function at the point `(x,y)`.
  * 
  * @param[in] interp the interpolation object, which should have already
@@ -235,6 +262,35 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
  *  what went wrong
  */
 int interp2d_eval_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
+
+/**
+ * Evaluate the interpolating function at the point `(x,y)`, without checking
+ * whether `(x,y)` is within the bounds of the interpolation. This function
+ * can be used for extrapolation - but do so at your own risk! Extrapolation
+ * quickly loses its predictive value as you move away from the region in which
+ * function values are known.
+ * 
+ * @param[in] interp the interpolation object, which should have already
+ *  been initialized using the arrays `xarr`, `yarr`, and `zarr`. This
+ *  object stores the sizes of the arrays (among other values).
+ * @param[in] xarr the x coordinates of the points defining the function.
+ *  This should be the same x array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] yarr the y coordinates of the points defining the function
+ *  This should be the same y array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] zarr the z coordinates of the points defining the function
+ *  This should be the same z array that was passed to interp2d_init()
+ *  when initializing `interp`.
+ * @param[in] x the x coordinate at which to evaluate the interpolation
+ * @param[in] y the y coordinate at which to evaluate the interpolation
+ * @param[in] xa the accelerator object for the x direction (may be NULL)
+ * @param[in] ya the accelerator object for the y direction (may be NULL)
+ * @param[out] z the value of the interpolating function at `(x,y)`
+ * @return a status code, either `GSL_SUCCESS` or an error code indicating
+ *  what went wrong
+ */
+int interp2d_eval_e_no_boundary_check(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z);
 
 /**
  * Evaluate the x derivative of the interpolating function at `(x,y)`.

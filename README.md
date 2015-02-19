@@ -18,3 +18,5 @@ If your code evaluates the interpolating function many times, it may benefit fro
     ./make install
 
 All files are licensed under the GPL version 3 or any later version at your option.
+
+Development of `interp2d` is hosted on the Github project page <https://github.com/diazona/interp2d>, which is where you should report bugs or offer suggestions for improvement if you would like to do so.
