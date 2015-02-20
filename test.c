@@ -2,7 +2,7 @@
  * This file is part of interp2d, a GSL-compatible two-dimensional
  * interpolation library. <http://www.ellipsix.net/interp2d.html>
  * 
- * Copyright 2012 David Zaslavsky
+ * Copyright 2012-2013 David Zaslavsky, Andrew W. Steiner
  * Portions based on GNU GSL interpolation code,
  *  copyright 1996, 1997, 1998, 1999, 2000, 2004 Gerard Jungman
  * 
@@ -41,7 +41,7 @@ static inline int test_single_low_level(
         int failures = 0;
         int status;
         double result = evaluator(interp, xarr, yarr, zarr, x, y, xa, ya);
-        gsl_test_abs(result, expected_results[i], 1e-10, "high level %s %d", interp2d_name(interp), i);
+        gsl_test_abs(result, expected_results[i], 1e-10, "low level %s %d", interp2d_name(interp), i);
         if (fabs(result - expected_results[i]) > 1e-10) {
             // test failed
             failures++;
@@ -52,7 +52,7 @@ static inline int test_single_low_level(
             failures++;
         }
         else {
-            gsl_test_abs(result, expected_results[i], 1e-10, "high level POSIX %s %d", interp2d_name(interp), i);
+            gsl_test_abs(result, expected_results[i], 1e-10, "low level POSIX %s %d", interp2d_name(interp), i);
             if (fabs(result - expected_results[i]) > 1e-10) {
                 // test failed - wrong result
                 failures++;
@@ -151,6 +151,7 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
             
             zi = INDEX_2D(xi, yi, xsize, ysize);
             test_single_low_level(&interp2d_eval, &interp2d_eval_e, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
+            test_single_low_level(&interp2d_eval_no_boundary_check, &interp2d_eval_e_no_boundary_check, interp, xarr, yarr, zarr, x, y, xa, ya, zarr, zi);
             test_single_high_level(&interp2d_spline_eval, &interp2d_spline_eval_e, interp_s, x, y, xa, ya, zarr, zi);
         }
     }
@@ -172,6 +173,8 @@ int test_interp2d(const double xarr[], const double yarr[], const double zarr[],
         test_single_high_level(&interp2d_spline_eval_deriv_xx,&interp2d_spline_eval_deriv_xx_e, interp_s, x, y, xa, ya, zxxval, i);
         test_single_high_level(&interp2d_spline_eval_deriv_yy,&interp2d_spline_eval_deriv_yy_e, interp_s, x, y, xa, ya, zyyval, i);
         test_single_high_level(&interp2d_spline_eval_deriv_xy,&interp2d_spline_eval_deriv_xy_e, interp_s, x, y, xa, ya, zxyval, i);
+
+        test_single_low_level(&interp2d_eval_no_boundary_check, &interp2d_eval_e_no_boundary_check, interp, xarr, yarr, zarr, x, y, xa, ya, zval, i);
     }
     gsl_interp_accel_free(xa);
     gsl_interp_accel_free(ya);
@@ -270,6 +273,34 @@ int test_bicubic_nonlinear() {
     return status;
 }
 
+// This function contributed by Andrew W. Steiner <awsteiner@gmail.com>
+int test_bicubic_nonlinear_nonsq() {
+    int status;
+    double xarr[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+    double yarr[] = {1.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0};
+    double zarr[] = { 1,  2,  3,  4,  5,  6,  7,  8, 9, 10,
+                      2,  2,  6,  4, 10,  6, 14,  8, 11, 12,
+                      3,  6,  3, 12, 15,  6, 21, 24, 13, 14,
+                      4,  4, 12,  4, 20, 12, 28,  8, 15, 16,
+                      5, 10, 15, 20,  5, 30, 35, 40, 17, 18,
+                      6,  6,  6, 12, 30,  6, 42, 24, 19, 20,
+                      7, 14, 21, 28, 35, 42,  7, 56, 21, 22,
+                      8,  8, 24,  8, 40, 24, 56,  8, 23, 24};
+    double xval[] = {1.4, 2.3, 9.7, 3.3, 9.5, 6.6, 5.1};
+    double yval[] = {1.0, 1.8, 1.9, 2.5, 2.7, 4.1, 3.3};
+    // results computed using GSL 1D cubic interpolation twice
+
+    double zval[]={1.4,2.46782030941187003,10.7717721621846465,
+           4.80725067958096375,11.6747032398627297,
+           11.2619968682970111,9.00168877916872567};
+    size_t xsize = sizeof(xarr) / sizeof(xarr[0]);
+    size_t ysize = sizeof(yarr) / sizeof(yarr[0]);
+    size_t test_size = sizeof(xval) / sizeof(xval[0]);
+    status = test_interp2d(xarr, yarr, zarr, xsize, ysize, xval, yval, zval,  NULL, NULL, NULL, NULL, NULL, test_size, interp2d_bicubic);
+    gsl_test(status, "bicubic interpolation on nonlinear symmetric function");
+    return status;
+}
+
 /**
  * Runs all the tests.
  */
@@ -281,5 +312,6 @@ int main(int argc, char** argv) {
     test_bilinear_asymmetric_z();
     test_bicubic();
     test_bicubic_nonlinear();
+    test_bicubic_nonlinear_nonsq();
     exit(gsl_test_summary());
 }

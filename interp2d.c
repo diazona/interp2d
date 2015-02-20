@@ -99,7 +99,6 @@ static inline int interp2d_eval_impl(
     const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya,
     double* result
 ) {
-    int status;
     if (x < interp->xmin || x > interp->xmax) {
         char errmsg[80];
         snprintf(errmsg, 80, "x value %g not in range %g to %g", x, interp->xmin, interp->xmax);
@@ -113,6 +112,19 @@ static inline int interp2d_eval_impl(
     return evaluator(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, result);
 }
 
+/**
+ * Another wrapper function that serves as a drop-in replacement for
+ * interp2d_eval_impl but does not check the bounds. This can be used
+ * for extrapolation.
+ */
+static inline int interp2d_eval_impl_no_boundary_check(
+    int (*evaluator)(const void*, const double xa[], const double ya[], const double za[], size_t xsize, size_t ysize, double x, double y, gsl_interp_accel*, gsl_interp_accel*, double* z),
+    const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya,
+    double* result
+) {
+    return evaluator(interp->state, xarr, yarr, zarr, interp->xsize, interp->ysize, x, y, xa, ya, result);
+}
+
 double interp2d_eval(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
     double z;
     int status = interp2d_eval_impl(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya, &z);
@@ -120,8 +132,19 @@ double interp2d_eval(const interp2d* interp, const double xarr[], const double y
     return z;
 }
 
+double interp2d_eval_no_boundary_check(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {
+    double z;
+    int status = interp2d_eval_impl_no_boundary_check(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya, &z);
+    DISCARD_STATUS(status)
+    return z;
+}
+
 int interp2d_eval_e(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
     return interp2d_eval_impl(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya, z);
+}
+
+int interp2d_eval_e_no_boundary_check(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya, double* z) {
+    return interp2d_eval_impl_no_boundary_check(interp->type->eval, interp, xarr, yarr, zarr, x, y, xa, ya, z);
 }
 
 double interp2d_eval_deriv_x(const interp2d* interp, const double xarr[], const double yarr[], const double zarr[], const double x, const double y, gsl_interp_accel* xa, gsl_interp_accel* ya) {

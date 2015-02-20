@@ -5,6 +5,14 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(GSL REQUIRED)
+include_directories(${GSL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${GSL_LIBRARIES})
+
+set(LIBS ${LIBS} m)
+
 # Code snippet from http://majewsky.wordpress.com/2010/08/14/tip-of-the-day-cmake-and-doxygen/
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -15,9 +23,30 @@ if(DOXYGEN_FOUND)
                     COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
 
-add_library(interp2d bilinear.c bicubic.c interp2d.c interp2d_spline.c)
-install(TARGETS interp2d DESTINATION lib)
+option(interp2d_STATIC_LIBRARY "Build interp2d as a static library" ON)
+option(interp2d_SHARED_LIBRARY "Build interp2d as a shared library" OFF)
+
+if (interp2d_STATIC_LIBRARY)
+  add_library(interp2d_static bilinear.c bicubic.c interp2d.c interp2d_spline.c)
+  set_target_properties(interp2d_static PROPERTIES OUTPUT_NAME interp2d)
+  install(TARGETS interp2d_static DESTINATION lib)
+endif (interp2d_STATIC_LIBRARY)
+if (interp2d_SHARED_LIBRARY)
+  add_library(interp2d_shared bilinear.c bicubic.c interp2d.c interp2d_spline.c)
+  if (NOT interp2d_STATIC_LIBRARY)
+    set_target_properties(interp2d_shared PROPERTIES OUTPUT_NAME interp2d)
+  endif (NOT interp2d_STATIC_LIBRARY)
+  install(TARGETS interp2d_shared DESTINATION lib)
+endif (interp2d_SHARED_LIBRARY)
+
 install(FILES interp2d.h interp2d_spline.h DESTINATION include)
 
 add_executable(interp2dtest test.c)
-target_link_libraries(interp2dtest m gsl interp2d)
+if (interp2d_STATIC_LIBRARY)
+  target_link_libraries(interp2dtest interp2d_static ${LIBS})
+else (interp2d_STATIC_LIBRARY)
+  target_link_libraries(interp2dtest interp2d_shared ${LIBS})
+endif (interp2d_STATIC_LIBRARY)
+
+enable_testing()
+add_test(all interp2dtest)
