@@ -41,6 +41,12 @@ endif (interp2d_SHARED_LIBRARY)
 
 install(FILES interp2d.h interp2d_spline.h DESTINATION include)
 
+# FindGSL.cmake does not give full paths to libraries like it's supposed
+# to. (Blame gsl-config, which does not obey the CMake convention of
+# returning full paths to libraries.) So it's necessary to explicitly
+# add directories in which to search for the GSL libraries.
+link_directories(${GSL_LIBRARY_DIRS})
+
 add_executable(interp2dtest test.c)
 if (interp2d_STATIC_LIBRARY)
   target_link_libraries(interp2dtest interp2d_static ${LIBS})
